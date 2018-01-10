@@ -41,7 +41,7 @@ class Emitter {
     }
 
     $this->redis = $redis;
-    $this->key = (isset($opts['key']) ? $opts['key'] : 'socket.io') . '#emitter';
+    $this->key = (isset($opts['key']) ? $opts['key'] : 'socket.io') . '#/#';
 
     $this->_rooms = array();
     $this->_flags = array();
@@ -117,7 +117,7 @@ class Emitter {
     }
 
     // publish
-    $packed = msgpack_pack_php(array($packet, array(
+    $packed = msgpack_pack_php(array('php-socket.io-emitter', $packet, array(
       'rooms' => $this->_rooms,
       'flags' => $this->_flags
     )));
@@ -127,7 +127,6 @@ class Emitter {
       $packed = str_replace(pack('c', 0xda), pack('c', 0xd8), $packed);
       $packed = str_replace(pack('c', 0xdb), pack('c', 0xd9), $packed);
     }
-
     $this->redis->publish($this->key, $packed);
 
     // reset state
